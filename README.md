@@ -1,6 +1,9 @@
 # CPP-Treasure Trove
 A collection of standalone useful (or not!) scripts written in cpp, as the byproducts of my personal cpp journey. As of the writing, the only dependency is the boost library.
 
+## Build Requirements
+1. libboost-all-dev 1.71
+
 ## Contents
 1. merge_list - Merge 2 input arrays into a single array.
 
