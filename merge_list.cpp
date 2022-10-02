@@ -8,6 +8,9 @@
         c. Both list1 and list2 are sorted in non-decreasing order.
  **/
 #include <iostream>
+#include <vector>
+
+#include "cmdutils.h"
 
 using namespace std;
 
@@ -18,7 +21,10 @@ constexpr std::size_t size(const T (&array)[N]) noexcept {
 }
 
 
-int* mergeTwoList(int* list1, int* list2, int* res, int i, int j) {
+int* mergeTwoList(std::vector<int> list1, std::vector<int> list2, int* res) {
+    int i = list1.size();
+    int j = list1.size();
+
     while (i > 0 && j > 0) {
         if (list1[i - 1] >= list2[j - 1]) {
             res[i + j - 1] = list1[i - 1];
@@ -47,16 +53,30 @@ int* mergeTwoList(int* list1, int* list2, int* res, int i, int j) {
 }
 
 
-int main() {
-    int arr_left[3] = {1, 2, 4};
-    int arr_right[3] = {1, 3, 4};
-    int i = size(arr_left);
-    int j = size(arr_right);
+int main(int argc, char *argv[]) {
+    // int arr_left[3] = {1, 2, 4};
+    // int arr_right[3] = {1, 3, 4};
 
-    int res[i + j] = {};
-    mergeTwoList(arr_left, arr_right, res, i, j);
+    std::vector<std::vector<std::string>> args;
+    args = parselist(argc, argv, args);
 
-    for (int k=0; k < i + j; k++) {
+    // Convert input string digits to ints
+    std::vector<int> arr_left;
+    for (int i=0; i < args[0].size(); i++) {
+        arr_left.push_back(stoi(args[0][i]));
+    }
+
+    std::vector<int> arr_right;
+    for (int i=0; i < args[1].size(); i++) {
+        arr_right.push_back(stoi(args[1][i]));
+    }
+
+    int total_size = arr_left.size() + arr_right.size();
+    int res[total_size] = {};
+
+    mergeTwoList(arr_left, arr_right, res);
+
+    for (int k=0; k < total_size; k++) {
         std::cout << res[k] << " ";
     }
 
