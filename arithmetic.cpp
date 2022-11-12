@@ -7,6 +7,23 @@
 using namespace std;
 
 
+bool isNumber(string& str)
+/*
+    Function to check the string character by character
+    Extracted from https://www.geeksforgeeks.org/continue-statement-cpp/
+    on 12 Nov 2022
+*/
+{
+    for (char const &c : str) {
+       
+        // using the std::isdigit() function
+        if (std::isdigit(c) == 0)
+          return false;
+    }
+    return true;
+}
+
+
 int random_one_digit(int phony) {
     return std::rand() % 10;
 }
@@ -83,6 +100,8 @@ int main(int argc, char* argv[]) {
 
     int x{0}; 
     int y{0};
+
+    string sanswer{""};
     int answer{0};
     int diff{stoi(sdiff)};
     int intense{stoi(sintense)};
@@ -104,7 +123,15 @@ int main(int argc, char* argv[]) {
         y = (*fcnPtr)(diff);
 
         std::cout << x << " + " << y << std::endl;
-        std::cin >> answer;
+        std::cin >> sanswer;
+
+        if (!isNumber(sanswer)) {
+            std::cout << "wrong" << std::endl;
+            i++;
+            continue;
+        }
+
+        answer = stoi(sanswer);
 
         if (x + y == answer) {
             std::cout << "correct" << std::endl;
@@ -125,7 +152,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "Elapsed: " << elapsed << " seconds" << std::endl;
-    std::cout << "Score: " << res << "/" << intense << std::endl;
+    std::cout << "Score: " << res << "/" << intense * 10 << std::endl;
     std::cout << "Speed: " << fixed << setprecision(5) << speed << " seconds per hit" << std::endl;
 
     updaterecords(&records, diff, intense, (int) elapsed);
