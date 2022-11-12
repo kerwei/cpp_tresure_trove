@@ -7,10 +7,59 @@
 using namespace std;
 
 
-int randintoflen(int n) {
-    int low{(int) pow(10, n-1)};
+int random_one_digit(int phony) {
+    return std::rand() % 10;
+}
 
-    return low + std::rand() % (int) (pow(10, n) - low) + 1;
+
+int random_ge_two_digit(int n) {
+    int low{(int) pow(10, n-1)};
+    return low + std::rand() % (int) (pow(10, n) - low);
+}
+
+
+void updaterecords(std::vector<std::vector<int>> *records, int diff, int intense, int score) {
+    /* records:
+            0    1     2     3    4 +--> diff
+        0   0    0     0     0    0
+        1   0    10    -1    -1   -1
+        2   0   -1     27    -1   -1
+        3   0   -1     -1    -1   -1
+        4   0   -1     -1    -1   -1
+        +
+        |
+        v
+        intense (x10)
+
+        Constraints:
+            diff > 0; intense > 0; (diff, intense) has a default value of -1
+
+        update (diff, intense) if 1/score > 1/(diff, intense)
+
+        TODO: Refactor this into a 1D array,
+        where column indices for the second row = col1 + (n x row) + coln
+        0, 1, 2, ... col, col1-0, col1-1, col1-2, ... col1-n, col2-0 
+    */
+    int rows = records->size();
+    int columns = records[0].size();
+
+    // Add more inner vectors to record if intense is greater than the rows
+    if (intense >= rows) {
+        std::vector<int> new_row(columns, -1);
+        std::vector<std::vector<int>> new_block(intense - rows + 1, new_row);
+        records->insert(records->end(), new_block.begin(), new_block.end());
+    }
+
+    // If diff is greater than the number of columns,
+    // append a -1 to the end of each nested vector
+    if (diff >= columns) {
+        for (int j = 0; j <= intense; j++) {
+            std::vector<int>::iterator it = (*records)[j].end();
+            (*records)[j].insert(it, diff - columns + 1, -1);
+        }
+    }
+
+    (*records)[intense][diff] = score;
 }
 
 
@@ -27,19 +76,32 @@ int main(int argc, char* argv[]) {
     std::cout << "Enter the intensity: (1) 10 questions (2) 20 questions ..." << std::endl;
     std::cin >> sintense;
 
+    // Create the record matrix
+    // TODO: Read the records from file
+    std::vector<int> rows(11, -1);
+    std::vector<std::vector<int>> records(11, rows);
+
     int x{0}; 
     int y{0};
     int answer{0};
     int diff{stoi(sdiff)};
-    int intense{stoi(sintense) * 10};
+    int intense{stoi(sintense)};
+
+    int (*fcnPtr)(int);
+    if (diff == 1) {
+        fcnPtr = &random_one_digit;
+    }
+    else {
+        fcnPtr = &random_ge_two_digit;
+    }
 
     int i{0};
     int res{0};
 
     time_t t_start = time(NULL);
-    while (i < intense) {
-        x = randintoflen(diff);
-        y = randintoflen(diff);
+    while (i < intense * 10) {
+        x = (*fcnPtr)(diff);
+        y = (*fcnPtr)(diff);
 
         std::cout << x << " + " << y << std::endl;
         std::cin >> answer;
@@ -65,6 +127,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Elapsed: " << elapsed << " seconds" << std::endl;
     std::cout << "Score: " << res << "/" << intense << std::endl;
     std::cout << "Speed: " << fixed << setprecision(5) << speed << " seconds per hit" << std::endl;
+
+    updaterecords(&records, diff, intense, (int) elapsed);
+    std::cout << "Updated records. Row: " << intense << " Col: " << diff << " Elapsed: " << records[intense][diff] << std::endl;
 
     return 0;
 }
