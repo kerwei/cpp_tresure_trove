@@ -10,6 +10,8 @@
 # include <string>
 # include <vector>
 
+using namespace std;
+
 
 std::array<double, 3> getLargestPeak(double prices[], int length) {
     double trough = 0;
